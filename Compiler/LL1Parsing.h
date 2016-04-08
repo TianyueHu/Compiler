@@ -97,7 +97,6 @@ private:
 	enum tokenType GetNewToken();
 	int GetLength(long long int code);
 	int Get2Code(long long int code, int n);
-	int GetEnd2Code(long long int code, int n);
 
 public: 
 	
@@ -113,5 +112,6 @@ public:
 
 	void PrintVariFst();
 	void PrintVariFol();
+	void PrintProFst();
 };
 

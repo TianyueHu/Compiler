@@ -11,10 +11,15 @@ int main()
 	l.OpenFile();
 	l.Production();
 	l.FisrtInit();
-	l.PrintVariFst();
-	cout << endl;
+	//l.PrintVariFst();
+	//cout << endl;
 	l.GetVariFst();
-	l.PrintVariFst();
+	//l.PrintVariFst();
+
+	l.GetVariFol();
+	//l.PrintVariFol();
+	l.GetProFst();
+	l.PrintProFst();
 	getchar();
 	return 0;
 }

@@ -68,9 +68,9 @@ enum tokenType {
 struct variable
 {
 	size_t code;
-	shared_ptr<struct terminal> next;
 	bool first[t_len];
 	bool follow[t_len];
+	shared_ptr<struct terminal> next;
 
 	struct variable(){
 		next = nullptr;
@@ -84,8 +84,8 @@ struct variable
 struct terminal
 {
 	long long int code;
-	shared_ptr<struct terminal> next;
 	bool first[t_len];
+	shared_ptr<struct terminal> next;
 
 	struct terminal(){
 		next = nullptr;

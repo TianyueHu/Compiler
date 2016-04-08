@@ -6,7 +6,6 @@ LL1Parsing::LL1Parsing()
 	produceSet = new ProductionSet();
 }
 
-
 LL1Parsing::~LL1Parsing()
 {
 	if (ifs.is_open()){
@@ -121,7 +120,7 @@ void LL1Parsing::GetVariFst()
 		flag = false;
 		for (size_t i = 0; i < size; ++i){
 			shared_ptr<struct variable> head = produceSet->proList[i];
-			shared_ptr<struct terminal> ptr = head->next;
+			shared_ptr<struct terminal> ptr = produceSet->proList[i]->next;
 			while(ptr){
 				for (size_t j = 1; j < (int)((GetLength(ptr->code) + 1) / 2) + 1; ++j){
 					int code = 0;
@@ -139,11 +138,9 @@ void LL1Parsing::GetVariFst()
 					else if (code > 49){
 						shared_ptr<struct variable> fst = produceSet->proList[code - 50];
 						for (size_t k = 0; k < t_len; ++k){
-							if (fst->first[k]){
-								if (!head->first[k]){
-									flag = true;
-									head->first[k] = true;
-								}
+							if (fst->first[k] && !head->first[k]){
+								flag = true;
+								head->first[k] = true;
 							}
 						}
 						if (!fst->first[0]){
@@ -159,12 +156,112 @@ void LL1Parsing::GetVariFst()
 
 void LL1Parsing::GetVariFol()
 {
+	bool flag = true;
+	size_t size = produceSet->proList.size();
 
+	produceSet->proList[0]->follow[0] = true;
+
+	while (flag){
+		flag = false;
+		for (size_t i = 0; i < size; ++i){
+			shared_ptr<struct variable> head = produceSet->proList[i];
+			shared_ptr<struct terminal> ptr = produceSet->proList[i]->next;
+			while (ptr){
+				//对每一个产生式
+				for (size_t j = 1; j < (int)((GetLength(ptr->code) + 1) / 2) + 1; ++j){
+					//对当前产生式中的每一个符号
+					int code = 0;//当前符号的编码
+					if (ptr->code < 10){
+						break;
+					}
+					else if ((code = Get2Code(ptr->code, j)) < 43){
+						//这里是从后面开始获得的
+						continue;
+					}
+					else if (code > 49){
+						//当前符号是非终结符
+
+						if ((j + 1) < (int)((GetLength(ptr->code) + 1) / 2) + 1){
+							//当前符号不是最后一个字符,这里将并上下一个字符的first集
+							
+							for (int offset = 1; (j + offset) < (int)((GetLength(ptr->code) + 1) / 2) + 1; ++offset){
+								//当没有查找到最后一个字符前
+
+								int nextCode = Get2Code(ptr->code, j + offset);
+								//下一个符号的编码
+								if (nextCode < 43){
+									//如果下一个字符是终结符
+									if (!produceSet->proList[code - 50]->follow[nextCode]){
+										produceSet->proList[code - 50]->follow[nextCode] = true;
+										flag = true;
+									}
+									break;
+								}
+								else if (nextCode > 49){
+									//如果下一个字符是非终结符
+									for (size_t k = 0; k < t_len; ++k){
+										if (produceSet->proList[nextCode - 50]->follow[k] && !produceSet->proList[code - 50]->follow[k]){
+											flag = true;
+											produceSet->proList[code - 50]->follow[k] = true;
+										}
+									}
+									if (!produceSet->proList[nextCode - 50]->first[0]){
+										break;
+									}
+								}
+							}
+						}
+						else {
+							//如果是最后一个字符，那么需要并上产生式前端的Follow集
+							for (size_t k = 0; k < t_len; ++k){
+								if (head->follow[k] && !produceSet->proList[code - 50]->follow[k]){
+									flag = true;
+									produceSet->proList[code - 50]->follow[k] = true;
+								}
+							}
+						}
+					}
+				}
+				ptr = ptr->next;
+			}
+		}
+	}
 }
 
 void LL1Parsing::GetProFst()
 {
+	size_t size = produceSet->proList.size();
 
+	for (size_t i = 0; i < size; ++i){
+		shared_ptr<struct variable> head = produceSet->proList[i];
+		shared_ptr<struct terminal> ptr = produceSet->proList[i]->next;
+		while (ptr){
+			//对每一个产生式
+			for (size_t j = 1; j < (int)((GetLength(ptr->code) + 1) / 2) + 1; ++j){
+				int code = 0;
+				if (ptr->code < 10){
+					ptr->first[ptr->code] = true;
+					break;
+				}
+				else if ((code = Get2Code(ptr->code, j)) < 43){
+					ptr->first[code] = true;
+					break;
+				}
+				else if (code > 49){
+					for (size_t k = 1; k < t_len; ++k){
+						if (produceSet->proList[code - 50]->first[k]){
+							ptr->first[k] = true;
+						}
+					}
+					if (!produceSet->proList[code - 50]->first[0]){
+						break;
+					}
+				}
+			}
+			ptr = ptr->next;
+		}
+	}
+	
 }
 
 int LL1Parsing::GetLength(long long int code)
@@ -176,20 +273,12 @@ int LL1Parsing::Get2Code(long long int code, int n)
 {
 	int len = GetLength(code);
 	if (len % 2 == 0){
-		return (int)(code / pow(10, len - 2 * n)) % 100;
+		return (long long int)(code / pow(10, len - 2 * n)) % 100;
 	}
 	else {
-		return (int)(code / pow(10, len - 2 * n + 1)) % 100;
+		return (long long int)(code / pow(10, len - 2 * n + 1)) % 100;
 	}
 	
-}
-
-int LL1Parsing::GetEnd2Code(long long int code, int n)
-{
-	int len = GetLength(code);
-	if (len % 2 == 0){
-		return (int)(code % (int)pow(10, len - 2 * n) / pow(10, 2 * n));
-	}
 }
 
 void LL1Parsing::PrintVariFst()
@@ -217,5 +306,28 @@ void LL1Parsing::PrintVariFol()
 			}
 		}
 		cout << endl;
+	}
+}
+
+void LL1Parsing::PrintProFst()
+{
+	size_t size = produceSet->proList.size();
+
+	for (size_t i = 0; i < size; ++i){
+		shared_ptr<struct variable> head = produceSet->proList[i];
+		cout << head->code << "--> ";
+		shared_ptr<struct terminal> ptr = produceSet->proList[i]->next;
+		while (ptr){
+			//对每一个产生式
+			cout << ptr->code << endl;
+			cout << "     ";
+			for (size_t j = 0; j < t_len; ++j){
+				if (ptr->first[j]){
+					cout << j << "|";
+				}
+			}
+			cout << endl;
+			ptr = ptr->next;
+		}
 	}
 }
