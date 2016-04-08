@@ -174,11 +174,11 @@ void LL1Parsing::GetVariFol()
 					if (ptr->code < 10){
 						break;
 					}
-					else if ((code = Get2Code(ptr->code, j)) < 43){
+					else if ((code = Get2Code(ptr->code, j)) < t_len){
 						//这里是从后面开始获得的
 						continue;
 					}
-					else if (code > 49){
+					else if (code > t_len){
 						//当前符号是非终结符
 
 						if ((j + 1) < (int)((GetLength(ptr->code) + 1) / 2) + 1){
@@ -189,7 +189,7 @@ void LL1Parsing::GetVariFol()
 
 								int nextCode = Get2Code(ptr->code, j + offset);
 								//下一个符号的编码
-								if (nextCode < 43){
+								if (nextCode < t_len){
 									//如果下一个字符是终结符
 									if (!produceSet->proList[code - 50]->follow[nextCode]){
 										produceSet->proList[code - 50]->follow[nextCode] = true;
@@ -197,7 +197,7 @@ void LL1Parsing::GetVariFol()
 									}
 									break;
 								}
-								else if (nextCode > 49){
+								else if (nextCode > t_len){
 									//如果下一个字符是非终结符
 									for (size_t k = 0; k < t_len; ++k){
 										if (produceSet->proList[nextCode - 50]->follow[k] && !produceSet->proList[code - 50]->follow[k]){
@@ -243,11 +243,11 @@ void LL1Parsing::GetProFst()
 					ptr->first[ptr->code] = true;
 					break;
 				}
-				else if ((code = Get2Code(ptr->code, j)) < 43){
+				else if ((code = Get2Code(ptr->code, j)) < t_len){
 					ptr->first[code] = true;
 					break;
 				}
-				else if (code > 49){
+				else if (code > t_len){
 					for (size_t k = 1; k < t_len; ++k){
 						if (produceSet->proList[code - 50]->first[k]){
 							ptr->first[k] = true;
@@ -331,3 +331,57 @@ void LL1Parsing::PrintProFst()
 		}
 	}
 }
+
+void LL1Parsing::GetFAATable()
+{
+	size_t size = produceSet->proList.size();
+	for (size_t i = 0; i < size; ++i){
+		shared_ptr<struct variable> head = produceSet->proList[i];
+		shared_ptr<struct terminal> ptr = produceSet->proList[i]->next;
+		while (ptr){
+
+			bool flag1 = false, flag2 = false;
+			if (ptr->first[0]){
+				flag1 = true;
+				if (head->follow[0]){
+					flag2 = true;
+				}
+			}
+			if (flag2){
+				faaTable[head->code - 50][t_len].push_back(ptr->code);
+			}
+			for (size_t j = 1; j < t_len; ++j){
+				if (ptr->first[j]){
+					faaTable[head->code - 50][j].push_back(ptr->code);
+				}
+				if (flag1 && head->follow[j]){
+					faaTable[head->code - 50][j].push_back(ptr->code);
+				}
+			}
+			ptr = ptr->next;
+		}
+	}
+}
+
+void LL1Parsing::PrintFAATable()
+{
+	size_t size = produceSet->proList.size();
+	for (size_t i = 0; i < size; ++i){
+		shared_ptr<struct variable> head = produceSet->proList[i];
+		shared_ptr<struct terminal> ptr = produceSet->proList[i]->next;
+		while (ptr){
+			cout << "head " << i + 50 << ":" << endl;
+			for (size_t j = 1; j < t_len + 1; ++j){
+				if (faaTable[i][j].size()){
+					cout << "node " << j << ":";
+					for (size_t k = 0; k < faaTable[i][j].size(); ++k){
+						cout << faaTable[i][j][k] << "|";
+					}
+					cout << endl;
+				}
+			}
+			ptr = ptr->next;
+		}
+	}
+}
+

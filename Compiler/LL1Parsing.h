@@ -94,9 +94,10 @@ class LL1Parsing
 private:
 	ifstream ifs;
 	ProductionSet* produceSet;
-	enum tokenType GetNewToken();
+	
 	int GetLength(long long int code);
 	int Get2Code(long long int code, int n);
+	vector<long long int> faaTable[40][43 + 1];
 
 public: 
 	
@@ -105,13 +106,15 @@ public:
 	void FisrtInit();
 	void OpenFile();
 	void Production();
-
+	enum tokenType GetNewToken();
 	void GetVariFst();
 	void GetVariFol();
 	void GetProFst();
+	void GetFAATable();
 
 	void PrintVariFst();
 	void PrintVariFol();
 	void PrintProFst();
+	void PrintFAATable();
 };
 

@@ -10,16 +10,22 @@ int main()
 	LL1Parsing l;
 	l.OpenFile();
 	l.Production();
-	l.FisrtInit();
-	//l.PrintVariFst();
-	//cout << endl;
-	l.GetVariFst();
+
+	l.FisrtInit();		//FIRST集合初始化
 	//l.PrintVariFst();
 
-	l.GetVariFol();
+	l.GetVariFst();		//求FIRST集
+	//l.PrintVariFst();
+
+	l.GetVariFol();		//求FOLLOW集
 	//l.PrintVariFol();
-	l.GetProFst();
-	l.PrintProFst();
+
+	l.GetProFst();		//求产生式的FIRST集合
+	//l.PrintProFst();
+
+	l.GetFAATable();	//构造预测分析表
+	//l.PrintFAATable();
+
 	getchar();
 	return 0;
 }
