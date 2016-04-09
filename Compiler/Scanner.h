@@ -3,8 +3,7 @@
 /*词法分析器
 读入程序代码
 分析出Toke*/
-#include "main.h"
-
+#include "NameTable.h"
 
 
 class Scanner
@@ -17,6 +16,7 @@ private:
 	string buffer;	//行缓冲区
 	shared_ptr<struct tokenRecord> head;	//token链表头指针
 	shared_ptr<struct tokenRecord> rear;	//token链表尾指针
+	NameTable nameTable;
 
 public:
 	Scanner();

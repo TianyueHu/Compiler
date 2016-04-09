@@ -7,7 +7,7 @@
 #include <fstream>
 #include <stack>
 
-#define t_len 43
+#define t_len 44
 using namespace std;
 enum tokenType {
 	EMPTY,
@@ -102,10 +102,42 @@ struct tokenRecord
 {
 	enum tokenType token;		//符号类型
 	shared_ptr<struct tokenRecord> next;	//指向下一个符号的指针
-
+	shared_ptr<struct nameItam> name_item;
 	//这里以后还要添加一个指向符号表的指针
 	tokenRecord()
 	{
 		next = nullptr;
+	}
+};
+
+struct nameItem
+{
+	string name;//每一个token的名字
+	//enum tokenType token_type;//token的类型
+	enum tokenType type;//实际的类型
+	int* extendPtr;//扩展属性指针
+	
+	shared_ptr<struct nameItem> next;
+
+	union {
+		char ch;
+		int intrger;
+		double rear;
+		char* str;
+		int* address;//分配的内存地址
+	} value;
+	struct nameItem(){
+		name = nullptr;
+		extendPtr = nullptr;
+	}
+};
+
+struct nameTableHead
+{
+	stack<shared_ptr<struct nameTableHead>> otherNameTable;
+	shared_ptr<struct nameItem> name_item;
+
+	struct nameTableHead(){
+		name_item = nullptr;
 	}
 };

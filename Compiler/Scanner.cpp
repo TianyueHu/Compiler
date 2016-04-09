@@ -366,6 +366,12 @@ void Scanner::Identify(char ch)
 	else if (!strcmp("Null", id1)){
 		newToken(EMPTY, id1);
 	}
+	else if (col_counter < buffer.size() && buffer[col_counter] == '['){
+		newToken(ARRAY, id1);
+	}
+	else if (col_counter < buffer.size() && buffer[col_counter] == '('){
+		newToken(FUNC, id1);
+	}
 	else{
 		newToken(ID, id1);
 	}
@@ -423,6 +429,8 @@ void Scanner::newToken(enum tokenType token)
 	recordPtr->token = token;
 	rear->next = recordPtr;
 	rear = rear->next;
+
+	recordPtr->name_item = nullptr;
 	ofs << token << " " << 0 << endl;
 }
 

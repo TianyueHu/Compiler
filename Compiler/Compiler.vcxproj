@@ -66,12 +66,14 @@
   <ItemGroup>
     <ClCompile Include="LL1Parsing.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NameTable.cpp" />
     <ClCompile Include="ProductionSet.cpp" />
     <ClCompile Include="Scanner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LL1Parsing.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="NameTable.h" />
     <ClInclude Include="ProductionSet.h" />
     <ClInclude Include="Scanner.h" />
   </ItemGroup>

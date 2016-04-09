@@ -102,7 +102,7 @@ void LL1Parsing::FisrtInit()
 			else{
 				int code = Get2Code(ptr->code, 1);
 				//cout <<"2 " << code << endl;
-				if (code < 43){
+				if (code < t_len){
 					head->first[code] = true;
 				}
 			}
@@ -128,7 +128,7 @@ void LL1Parsing::GetVariFst()
 						head->first[ptr->code] = true;
 						break;
 					}
-					else if ((code = Get2Code(ptr->code, j)) < 43){
+					else if ((code = Get2Code(ptr->code, j)) < t_len){
 						if (!head->first[code]){
 							flag = true;
 							head->first[code] = true;
@@ -466,7 +466,7 @@ int LL1Parsing::GetCode(enum tokenType token)
 		return 16;
 	if (token == LS_BRAC)
 		return 17;
-	if (token == LR_BRAC)
+	if (token == RS_BRAC)
 		return 18;
 	if (token == SEMIC)
 		return 19;
@@ -516,6 +516,8 @@ int LL1Parsing::GetCode(enum tokenType token)
 		return 41;
 	if (token == MOD)
 		return 42;
+	if (token == CH)
+		return 43;
 	return 0;
 		
 }

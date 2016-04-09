@@ -4,8 +4,6 @@
 
 class ProductionSet
 {
-private:
-	size_t t_lenth;//ÖÕ½á·û³¤¶È
 
 public:
 	ProductionSet();

@@ -46,7 +46,7 @@ return 29
 / 40
 * 41
 % 42
-
+CH 43
 
 ³ÌÐò 50
 À©Õ¹ÉùÃ÷ 51
@@ -97,7 +97,7 @@ private:
 	
 	int GetLength(long long int code);
 	int Get2Code(long long int code, int n);
-	vector<long long int> faaTable[40][43 + 1];
+	vector<long long int> faaTable[40][44 + 1];
 
 public: 
 	

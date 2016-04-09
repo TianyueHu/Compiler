@@ -4,9 +4,9 @@
 
 int main()
 {
-	/*Scanner *s = new Scanner();
+	Scanner *s = new Scanner();
 	s->OpenFile("e:\\test.txt");
-	s->scanner();*/
+	s->scanner();
 	LL1Parsing l;
 	l.OpenFile();
 	l.Production();
@@ -24,8 +24,8 @@ int main()
 	//l.PrintProFst();
 
 	l.GetFAATable();	//构造预测分析表
-	l.PrintFAATable();
-	l.LL1();
+	//l.PrintFAATable();
+	l.LL1();			//LL1语法分析
 	getchar();
 	return 0;
 }
