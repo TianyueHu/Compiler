@@ -4,9 +4,9 @@
 
 int main()
 {
-	//Scanner *s = new Scanner();
-	//s->OpenFile("e:\\test.txt");
-	//s->scanner();
+	/*Scanner *s = new Scanner();
+	s->OpenFile("e:\\test.txt");
+	s->scanner();*/
 	LL1Parsing l;
 	l.OpenFile();
 	l.Production();
@@ -15,7 +15,7 @@ int main()
 	//l.PrintVariFst();
 
 	l.GetVariFst();		//求FIRST集
-	//l.PrintVariFst();
+	l.PrintVariFst();
 
 	l.GetVariFol();		//求FOLLOW集
 	//l.PrintVariFol();
@@ -24,8 +24,8 @@ int main()
 	//l.PrintProFst();
 
 	l.GetFAATable();	//构造预测分析表
-	//l.PrintFAATable();
-
+	l.PrintFAATable();
+	l.LL1();
 	getchar();
 	return 0;
 }

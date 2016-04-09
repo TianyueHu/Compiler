@@ -4,6 +4,7 @@
 LL1Parsing::LL1Parsing()
 {
 	produceSet = new ProductionSet();
+	
 }
 
 LL1Parsing::~LL1Parsing()
@@ -81,7 +82,6 @@ enum tokenType LL1Parsing::GetNewToken()
 
 	char* str1 = new char[i + 1]();
 	strcpy(str1, str);
-	cout << str1 << endl;
 	
 	enum tokenType ret = enum tokenType(atoi(str1));
 
@@ -200,7 +200,7 @@ void LL1Parsing::GetVariFol()
 								else if (nextCode > t_len){
 									//如果下一个字符是非终结符
 									for (size_t k = 0; k < t_len; ++k){
-										if (produceSet->proList[nextCode - 50]->follow[k] && !produceSet->proList[code - 50]->follow[k]){
+										if (produceSet->proList[nextCode - 50]->first[k] && !produceSet->proList[code - 50]->follow[k]){
 											flag = true;
 											produceSet->proList[code - 50]->follow[k] = true;
 										}
@@ -350,7 +350,7 @@ void LL1Parsing::GetFAATable()
 			if (flag2){
 				faaTable[head->code - 50][t_len].push_back(ptr->code);
 			}
-			for (size_t j = 1; j < t_len; ++j){
+			for (size_t j = 0; j < t_len; ++j){
 				if (ptr->first[j]){
 					faaTable[head->code - 50][j].push_back(ptr->code);
 				}
@@ -377,11 +377,138 @@ void LL1Parsing::PrintFAATable()
 					for (size_t k = 0; k < faaTable[i][j].size(); ++k){
 						cout << faaTable[i][j][k] << "|";
 					}
-					cout << endl;
 				}
 			}
+			cout << endl;
 			ptr = ptr->next;
 		}
 	}
 }
 
+void LL1Parsing::LL1()
+{
+	stack<int> s;
+	enum tokenType token;
+	s.push(99);
+	s.push(50);
+	int top;
+	token = GetNewToken();
+	do{
+		top = s.top();
+		
+		if (top < t_len || top == 99){
+			if (top != 99 && top == GetCode(token)){
+				cout << "pop " << top << endl;
+				s.pop();
+				token = GetNewToken();
+			}
+			else {
+				cerr << "error" << endl;
+			}
+		}
+		else{
+			if (faaTable[top - 50][GetCode(token)].size()>0){
+				long long int code = faaTable[top - 50][GetCode(token)][0];
+				cout << top << "-->" << code << endl;
+				s.pop();
+				if (code > 0){
+					for (size_t j = (int)((GetLength(code) + 1) / 2); j > 0; --j){
+						s.push(Get2Code(code, j));
+					}
+				}
+			}
+			else {
+				cerr << "error" << endl;
+			}
+		}
+	} while (s.top() != 99 && !s.empty());
+}
+
+int LL1Parsing::GetCode(enum tokenType token)
+{
+	if (token == NOT)
+		return 1;
+	if (token == AND)
+		return 2;
+	if (token == OR)
+		return 3;
+	if (token == ID)
+		return 4;
+	if (token == ARRAY)
+		return 5;
+	if (token == FUNC)
+		return 6;
+	if (token == STRING)
+		return 7;
+	if (token == INTEGER)
+		return 8;
+	if (token == REAL)
+		return 9;
+	if (token == LR_BRAC)
+		return 10;
+	if (token == RR_BRAC)
+		return 11;
+	if (token == CHAR)
+		return 12;
+	if (token == INT)
+		return 13;
+	if (token == FLOAT)
+		return 14;
+	if (token == DOUBLE)
+		return 15;
+	if (token == COMMA)
+		return 16;
+	if (token == LS_BRAC)
+		return 17;
+	if (token == LR_BRAC)
+		return 18;
+	if (token == SEMIC)
+		return 19;
+	if (token == ASSIGN)
+		return 20;
+	if (token == LB_BRAC)
+		return 21;
+	if (token == RB_BRAC)
+		return 22;
+	if (token == IF)
+		return 23;
+	if (token == ELSE)
+		return 24;
+	if (token == WHILE)
+		return 25;
+	if (token == FOR)
+		return 26;
+	if (token == CONTINUE)
+		return 27;
+	if (token == BREAK)
+		return 28;
+	if (token == RETURN)
+		return 29;
+	if (token == QUES_MARK)
+		return 30;
+	if (token == COLON)
+		return 31;
+	if (token == GT )
+		return 32;
+	if (token == LT)
+		return 33;
+	if (token == LE )
+		return 34;
+	if (token == GE)
+		return 35;
+	if (token == NE)
+		return 36;
+	if (token == EQ)
+		return 37;
+	if (token == PLUS)
+		return 38;
+	if (token == MINUS)
+		return 39;
+	if (token == RDIV)
+		return 40;
+	if (token == MULTI)
+		return 41;
+	if (token == MOD)
+		return 42;
+		
+}

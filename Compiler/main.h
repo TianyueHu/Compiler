@@ -5,6 +5,8 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include <stack>
+
 #define t_len 43
 using namespace std;
 enum tokenType {
@@ -15,6 +17,7 @@ enum tokenType {
 	STRING,
 	CH,
 	ARRAY,
+	FUNC,
 	NOT,
 	AND,
 	OR,

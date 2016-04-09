@@ -111,6 +111,8 @@ public:
 	void GetVariFol();
 	void GetProFst();
 	void GetFAATable();
+	void LL1();
+	int GetCode(enum tokenType token);
 
 	void PrintVariFst();
 	void PrintVariFol();
