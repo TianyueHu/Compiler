@@ -210,6 +210,12 @@ void LL1Parsing::GetVariFol()
 									}
 								}
 							}
+							for (size_t k = 0; k < t_len; ++k){
+								if (head->follow[k] && !produceSet->proList[code - 50]->follow[k]){
+									flag = true;
+									produceSet->proList[code - 50]->follow[k] = true;
+								}
+							}
 						}
 						else {
 							//如果是最后一个字符，那么需要并上产生式前端的Follow集
@@ -510,5 +516,6 @@ int LL1Parsing::GetCode(enum tokenType token)
 		return 41;
 	if (token == MOD)
 		return 42;
+	return 0;
 		
 }

@@ -15,7 +15,7 @@ int main()
 	//l.PrintVariFst();
 
 	l.GetVariFst();		//求FIRST集
-	l.PrintVariFst();
+	//l.PrintVariFst();
 
 	l.GetVariFol();		//求FOLLOW集
 	//l.PrintVariFol();
