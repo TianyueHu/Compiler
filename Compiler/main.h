@@ -6,8 +6,11 @@
 #include <iostream>
 #include <fstream>
 #include <stack>
+#include <queue>
+#include <map>
 
 #define t_len 44
+#define variSrt 50
 using namespace std;
 enum tokenType {
 	EMPTY,
@@ -113,7 +116,7 @@ struct tokenRecord
 struct nameItem
 {
 	string name;//每一个token的名字
-	//enum tokenType token_type;//token的类型
+	enum tokenType token_type;//token的类型
 	enum tokenType type;//实际的类型
 	int* extendPtr;//扩展属性指针
 	
@@ -139,5 +142,42 @@ struct nameTableHead
 
 	struct nameTableHead(){
 		name_item = nullptr;
+	}
+};
+
+struct LR1ItemNode
+{
+	int headCode;
+	long long int proCode;
+	bool advancedCode[t_len];
+	int point;//记录当前点的位置
+	bool isVisited;
+
+	int advanced;
+	shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> gotoPtr;
+	struct LR1ItemNode(){
+		advanced = 0;
+		gotoPtr = nullptr;
+		isVisited = false;
+		point = 0;
+		for (size_t k = 0; k < t_len; ++k){
+			advancedCode[k] = false;
+		}
+	}
+};
+
+struct itemSetNode
+{
+	short flag;
+	shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> gotoPtr;
+	
+	int head;
+	long long int code;
+	itemSetNode()
+	{
+		flag = 0;
+		gotoPtr = nullptr;
+		head = 0;
+		code = 0;
 	}
 };

@@ -1,31 +1,28 @@
 #include "main.h"
 #include "Scanner.h"
 #include "LL1Parsing.h"
-
+#include "LR1Parsing.h"
 int main()
 {
 	Scanner *s = new Scanner();
 	s->OpenFile("e:\\test.txt");
 	s->scanner();
-	LL1Parsing l;
-	l.OpenFile();
-	l.Production();
+	
+	/*
+	LL1Parsing ll1;
+	ll1.LL1();			//LL1语法分析
+	*/
 
-	l.FisrtInit();		//FIRST集合初始化
-	//l.PrintVariFst();
+	LR1Parsing lr1;
+	lr1.OpenFile();
+	lr1.Production();
+	lr1.FisrtInit();
+	lr1.GetVariFst();
+	lr1.GetClosureSet();
+	lr1.GetLR1ParsingTable();
+	lr1.LR1();
 
-	l.GetVariFst();		//求FIRST集
-	//l.PrintVariFst();
 
-	l.GetVariFol();		//求FOLLOW集
-	//l.PrintVariFol();
-
-	l.GetProFst();		//求产生式的FIRST集合
-	//l.PrintProFst();
-
-	l.GetFAATable();	//构造预测分析表
-	//l.PrintFAATable();
-	l.LL1();			//LL1语法分析
 	getchar();
 	return 0;
 }

@@ -393,6 +393,24 @@ void LL1Parsing::PrintFAATable()
 
 void LL1Parsing::LL1()
 {
+	OpenFile();
+	Production();
+
+	FisrtInit();		//FIRST集合初始化
+	//l.PrintVariFst();
+
+	GetVariFst();		//求FIRST集
+	//l.PrintVariFst();
+
+	GetVariFol();		//求FOLLOW集
+	//l.PrintVariFol();
+
+	GetProFst();		//求产生式的FIRST集合
+	//l.PrintProFst();
+
+	GetFAATable();	//构造预测分析表
+	//l.PrintFAATable();
+
 	stack<int> s;
 	enum tokenType token;
 	s.push(99);

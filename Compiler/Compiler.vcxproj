@@ -65,6 +65,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="LL1Parsing.cpp" />
+    <ClCompile Include="LR1Parsing.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NameTable.cpp" />
     <ClCompile Include="ProductionSet.cpp" />
@@ -72,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LL1Parsing.h" />
+    <ClInclude Include="LR1Parsing.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="NameTable.h" />
     <ClInclude Include="ProductionSet.h" />

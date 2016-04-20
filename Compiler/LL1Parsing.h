@@ -1,5 +1,4 @@
 #pragma once
-#include "main.h"
 #include "ProductionSet.h"
 
 /*
@@ -98,11 +97,6 @@ private:
 	int GetLength(long long int code);
 	int Get2Code(long long int code, int n);
 	vector<long long int> faaTable[40][44 + 1];
-
-public: 
-	
-	LL1Parsing();
-	~LL1Parsing();
 	void FisrtInit();
 	void OpenFile();
 	void Production();
@@ -111,8 +105,15 @@ public:
 	void GetVariFol();
 	void GetProFst();
 	void GetFAATable();
-	void LL1();
 	int GetCode(enum tokenType token);
+
+public: 
+	
+	LL1Parsing();
+	~LL1Parsing();
+	
+	void LL1();
+
 
 	void PrintVariFst();
 	void PrintVariFol();
