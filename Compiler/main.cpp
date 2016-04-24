@@ -14,12 +14,6 @@ int main()
 	*/
 
 	LR1Parsing lr1;
-	lr1.OpenFile();
-	lr1.Production();
-	lr1.FisrtInit();
-	lr1.GetVariFst();
-	lr1.GetClosureSet();
-	lr1.GetLR1ParsingTable();
 	lr1.LR1();
 
 

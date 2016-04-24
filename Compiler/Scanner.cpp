@@ -160,22 +160,32 @@ void Scanner::Sort(char ch)
 					newToken(NE, "<>");
 				else if (tch == '=')
 					newToken(LE, "<=");
+				else{
+					--col_counter;
+					newToken(LT, '<');
+				}
 			}
 			else{
 				--col_counter;
 				newToken(LT, '<');
 			}
+			
 			break;
 		case '>':
 			if (++col_counter < buffer.size()){
 				char tch = buffer[col_counter];
 				if (tch == '=')
 					newToken(GE, ">=");
+				else{
+					--col_counter;
+					newToken(GT, '>');
+				}
 			}
 			else{
 				--col_counter;
 				newToken(GT, '>');
 			}
+			
 			break;
 		default:
 			//这里应该有一个出错的提示或者处理

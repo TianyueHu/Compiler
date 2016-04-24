@@ -4,7 +4,7 @@
 LR1Parsing::LR1Parsing()
 {
 	produceSet = new ProductionSet();
-	
+
 }
 
 LR1Parsing::~LR1Parsing()
@@ -12,8 +12,11 @@ LR1Parsing::~LR1Parsing()
 	if (ifs.is_open()){
 		ifs.close();
 	}
+	if (ofs.is_open()){
+		ofs.close();
+	}
 	delete produceSet;
-	
+
 	//这里要删除在map里新建的所有的数组
 }
 
@@ -55,13 +58,18 @@ void LR1Parsing::Production()
 void LR1Parsing::OpenFile()
 {
 	ifs.open("a.txt");
+	ofs.open("b.txt");
 	if (!ifs.is_open()){
-		cerr << "error in LL1Parsing" << endl;
+		cerr << "error in LL1Parsing open file" << endl;
+	}
+	if (!ofs.is_open()){
+		cerr << "error in LL1Parsing open file" << endl;
 	}
 }
 
 int LR1Parsing::GetLength(long long int code)
 {
+	int a = log10l(code);
 	return ((int)log10l(code) + 1);
 }
 
@@ -69,7 +77,7 @@ int LR1Parsing::Get2Code(long long int code, int n)
 {
 	int len = GetLength(code);
 	if (len % 2 == 0){
-		return (long long int)(code / pow(10, len - 2 * n)) % 100;
+		return (long long int)(code / (long long int)pow(10, len - 2 * n)) % 100;
 	}
 	else {
 		return (long long int)(code / pow(10, len - 2 * n + 1)) % 100;
@@ -182,7 +190,7 @@ void LR1Parsing::GetClosureSet()
 
 	while (codePtr){
 		shared_ptr<struct LR1ItemNode> startNode = make_shared<struct LR1ItemNode>();
-		
+
 		startNode->advancedCode[0] = true;
 		startNode->headCode = variSrt;
 		startNode->proCode = codePtr->code;
@@ -199,19 +207,19 @@ void LR1Parsing::GetClosureSet()
 	while (que.size()){
 		shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> item = que.front();
 		que.pop();
-		
+
 		//现在处理item 针对每一个产生式产生一个新的转移
 		for (vector<shared_ptr<struct LR1ItemNode>>::iterator iter = item->begin(); iter != item->end(); ++iter){
 			if ((*iter)->proCode < 10 && (*iter)->point == 0){
 				//当前产生式还没有到规约的时候
 				(*iter)->advanced = (*iter)->proCode;
-				
+
 			}
 			else if ((*iter)->proCode > 9 && (*iter)->point < (GetLength((*iter)->proCode) + 1) / 2){
 				//当前产生式还没有到规约的时候
-				
+
 				(*iter)->advanced = Get2Code((*iter)->proCode, (*iter)->point + 1);
-				
+
 			}
 			else{
 				continue;
@@ -227,7 +235,7 @@ void LR1Parsing::GetClosureSet()
 				}
 			}
 
-			
+
 			newItem->push_back(newNode);
 			GetClosure(newItem);
 			bool tempFlag = false;
@@ -244,7 +252,7 @@ void LR1Parsing::GetClosureSet()
 				itemSet.push_back(newItem);
 				(*iter)->gotoPtr = newItem;
 			}
-			
+
 		}
 	}
 }
@@ -254,11 +262,12 @@ void LR1Parsing::GetClosure(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> i
 	//展示不考虑重复的问题
 	vector<shared_ptr<struct LR1ItemNode>> tempSet;
 	bool flag = true;
-	
+
 
 	while (flag){
 		flag = false;
 		for (vector<shared_ptr<struct LR1ItemNode>>::iterator iter = item->begin(); iter != item->end(); ++iter){
+			
 			bool advancedList[t_len];
 			for (size_t i = 0; i < t_len; ++i){
 				advancedList[i] = false;
@@ -272,7 +281,7 @@ void LR1Parsing::GetClosure(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> i
 				}
 				if (code > 9 && (*iter)->point + 2 < (GetLength(code) + 1) / 2 + 1 && Get2Code(code, (*iter)->point + 1) >= variSrt){
 					//不是最后一个字符
-					
+
 					int nowCode = Get2Code(code, (*iter)->point + 1);//点符号后面一个字符
 					int count = (*iter)->point + 2;
 					while (count < (GetLength(code) + 1) / 2 + 1){
@@ -305,14 +314,14 @@ void LR1Parsing::GetClosure(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> i
 				}
 				else if (code > 9 && (*iter)->point + 1 < (GetLength(code) + 1) / 2 + 1 && Get2Code(code, (*iter)->point + 1) >= variSrt){
 					//如果是最后一个字符则继承
-					
+
 					for (size_t k = 0; k < t_len; ++k){
 						if ((*iter)->advancedCode[k]){
 							advancedList[k] = true;
 						}
 					}
 				}
-				
+
 				if (code > 9 && (*iter)->point + 1 < (GetLength(code) + 1) / 2 + 1 && Get2Code(code, (*iter)->point + 1) >= variSrt){
 					//如果不是终结符就跳过
 					//将所有推出的产生式并入当前的集合
@@ -350,18 +359,23 @@ void LR1Parsing::GetClosure(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> i
 
 void LR1Parsing::GetLR1ParsingTable()
 {
-	for (vector<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>>::iterator iter = itemSet.begin(); iter != itemSet.end(); ++iter){
+	size_t i = 0;
+	for (vector<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>>::iterator iter = itemSet.begin(); iter != itemSet.end(); ++iter, ++i){
 
 		itemTable[(*iter)] = new struct itemSetNode[90]();//前面t_len个是转移或者归约表，variSrt以后是GOTO表
-
+		if (i == 0){
+			itemTable[(*iter)][50].flag = 4;
+		}
 	}
-
+	cout << "一共有" << i << "个项目集" << endl;
 	for (vector<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>>::iterator iter = itemSet.begin(); iter != itemSet.end(); ++iter){
 		//对于每一个项
 		shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> item = (*iter);
+		
 		for (vector<shared_ptr<struct LR1ItemNode>>::iterator itemIter = item->begin(); itemIter != item->end(); ++itemIter){
 			//对于项里每一个产生式
 			shared_ptr<struct LR1ItemNode> itemNode = (*itemIter);
+			
 			if (itemNode->gotoPtr){
 				//说明状态点不在产生式的最后
 				int gotoCode = itemNode->advanced;
@@ -381,6 +395,7 @@ void LR1Parsing::GetLR1ParsingTable()
 				//产生式的规约
 				for (size_t k = 0; k < t_len; ++k){
 					if (itemNode->advancedCode[k]){
+
 						itemTable[item][k].head = itemNode->headCode;
 						itemTable[item][k].code = itemNode->proCode;
 						itemTable[item][k].flag = 2;
@@ -391,7 +406,7 @@ void LR1Parsing::GetLR1ParsingTable()
 	}
 }
 
-bool LR1Parsing::Compare2Item(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> vector1, 
+bool LR1Parsing::Compare2Item(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> vector1,
 	shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> vector2)
 {
 	bool flag = true;
@@ -406,7 +421,7 @@ bool LR1Parsing::Compare2Item(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>
 				if ((*iter1)->headCode == (*iter2)->headCode
 					&& (*iter1)->proCode == (*iter2)->proCode
 					&& (*iter1)->point == (*iter2)->point){
-					
+
 					for (size_t k = 0; k < t_len; ++k){
 						if ((*iter1)->advancedCode[k] != (*iter2)->advancedCode[k]){
 							flag = false;
@@ -431,34 +446,61 @@ bool LR1Parsing::Compare2Item(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>
 
 void LR1Parsing::LR1()
 {
+	OpenFile();
+	Production();
+	FisrtInit();
+	GetVariFst();
+	GetClosureSet();
+	GetLR1ParsingTable();
+
+
 	shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> item = itemSet.front();
 	int symbol = GetCode(GetNewToken());
 	stack<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>> itemStack;
-	stack<int> symbolStack;
+	//stack<int> symbolStack;
+	vector<int> symbolStack;
 	itemStack.push(item);
+	symbolStack.push_back(0);
 	while (true)
 	{
-		
 		struct itemSetNode itemNode = itemTable[itemStack.top()][symbol];
-		if (symbol && itemNode.flag == 1){//不是规约
+		if (itemNode.flag == 1){//不是规约
 			itemStack.push(itemNode.gotoPtr);
-			symbolStack.push(symbol);
-			cout << "state:" << itemNode.head << "-->" << itemNode.code << endl;
-			cout << "ip:" << symbol << endl;
+			symbolStack.push_back(symbol);
+			ofs << "push:" << symbol << " " << PrintID(symbol) << endl;
+			ofs << "Stack:";
+			for (size_t i = 0; i < itemStack.size(); ++i){
+				ofs << symbolStack[i] << " ";
+			}
+			cout << endl;
 			symbol = GetCode(GetNewToken());
 		}
-		else if (symbol && itemNode.flag == 2){//规约
-			
-			int length = (GetLength(itemNode.code) + 1 ) / 2;
+		else if (itemNode.flag == 2){//规约
+
+			ofs << "规约:" << PrintID(itemNode.head)<< itemNode.head << "-->" << itemNode.code << endl;
+			int length = (GetLength(itemNode.code) + 1) / 2;
 			while (length > 0){
-				cout << "pop:" << symbolStack.top() << endl;
+
 				itemStack.pop();
-				symbolStack.pop();
+				symbolStack.pop_back();
 				--length;
 			}
+
+			symbolStack.push_back(itemNode.head);
+			//cout << "push:" << itemNode.head << endl;
 			
-			symbolStack.push(itemNode.head);
+			if (itemTable[itemStack.top()][itemNode.head].flag == 4 && symbol == 0){
+				
+				ofs << "Accept!" << endl;
+				ofs << "finish!" << endl;
+				return;
+			}
 			itemStack.push(itemTable[itemStack.top()][itemNode.head].gotoPtr);
+			ofs << "Stack:";
+			for (size_t i = 0; i < itemStack.size(); ++i){
+				ofs << symbolStack[i] << " ";
+			}
+			ofs << endl;
 		}
 		else{
 			cout << "error" << endl;
@@ -556,4 +598,175 @@ int LR1Parsing::GetCode(enum tokenType token)
 	if (token == CH)
 		return 43;
 	return 0;
+}
+
+string LR1Parsing::PrintID(int token)
+{
+	if (token == 1)
+		return "NOT";
+	if (token == 2)
+		return "AND";
+	if (token == 3)
+		return "OR";
+	if (token == 4)
+		return "ID";
+	if (token == 5)
+		return "ARRAY";
+	if (token == 6)
+		return "FUNC";
+	if (token == 7)
+		return "STRING";
+	if (token == 8)
+		return "INTEGER";
+	if (token == 9)
+		return "REAL";
+	if (token == 10)
+		return "(";
+	if (token == 11)
+		return ")";
+	if (token == 12)
+		return "CHAR";
+	if (token == 13)
+		return "INT";
+	if (token == 14)
+		return "FLOAT";
+	if (token == 15)
+		return "COUBLE";
+	if (token == 16)
+		return "COMMA";
+	if (token == 17)
+		return "[";
+	if (token == 18)
+		return "]";
+	if (token == 19)
+		return ";";
+	if (token == 20)
+		return "-";
+	if (token == 21)
+		return "{";
+	if (token == 22)
+		return "}";
+	if (token == 23)
+		return "IF";
+	if (token == 24)
+		return "ELSE";
+	if (token == 25)
+		return "WHILE";
+	if (token == 26)
+		return "FOR";
+	if (token == 27)
+		return "CONTINUE";
+	if (token == 28)
+		return "BREAK";
+	if (token == 29)
+		return "RETURN";
+	if (token == 30)
+		return "QUES_MARK";
+	if (token == 31)
+		return "COLON";
+	if (token == 32)
+		return ">";
+	if (token == 33)
+		return ">";
+	if (token == 34)
+		return "<=";
+	if (token == 35)
+		return ">=";
+	if (token == 36)
+		return "<>";
+	if (token == 37)
+		return "=";
+	if (token == 38)
+		return "+";
+	if (token == 39)
+		return "-";
+	if (token == 40)
+		return "*";
+	if (token == 41)
+		return "/";
+	if (token == 42)
+		return "%";
+	if (token == 43)
+		return "CH";
+	if (token == 50)
+		return "程序";
+	if (token == 51)
+		return "扩展声明";
+	if (token == 52)
+		return "函数定义";
+	if (token == 53)
+		return "类型定义";
+	if (token == 54)
+		return "形参列表";
+	if (token == 55)
+		return "形参声明";
+	if (token == 56)
+		return "声明序列";
+	if (token == 57)
+		return "初始化声明";
+	if (token == 58)
+		return "直接声明体";
+	if (token == 59)
+		return "初始化程序";
+	if (token == 60)
+		return "初始化序列";
+	if (token == 61)
+		return "初始化序列1";
+	if (token == 62)
+		return "复合语句";
+	if (token == 63)
+		return "复合语句体";
+	if (token == 64)
+		return "语句序列";
+	if (token == 65)
+		return "语句";
+	if (token == 66)
+		return "表达语句";
+	if (token == 67)
+		return "分支语句";
+	if (token == 68)
+		return "循环语句";
+	if (token == 69)
+		return "跳转语句";
+	if (token == 70)
+		return "表达式";
+	if (token == 71)
+		return "条件表达式";
+	if (token == 72)
+		return "三目运算式";
+	if (token == 73)
+		return "逻辑表达式";
+	if (token == 74)
+		return "逻辑表达式1";
+	if (token == 75)
+		return "逻辑符";
+	if (token == 76)
+		return "关系表达式";
+	if (token == 77)
+		return "关系表达式1";
+	if (token == 78)
+		return "关系操作符";
+	if (token == 79)
+		return "因式";
+	if (token == 80)
+		return "因式1";
+	if (token == 81)
+		return "项";
+	if (token == 82)
+		return "后缀表达式";
+	if (token == 83)
+		return "基本表达式";
+	if (token == 84)
+		return "实参列表";
+	if (token == 85)
+		return "加减操作符";
+	if (token == 86)
+		return "乘除操作符";
+	if (token == 87)
+		return "if语句";
+	if (token == 88)
+		return "else语句";
+	if (token == 89)
+		return "项1";
+	return "empty";
 }

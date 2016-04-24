@@ -5,6 +5,7 @@ class LR1Parsing
 {
 private:
 	ifstream ifs;
+	ofstream ofs;
 	vector<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>> itemSet;
 	ProductionSet* produceSet;
 	map<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>, struct itemSetNode*> itemTable;
@@ -15,7 +16,7 @@ private:
 	bool LR1Parsing::Compare2Item(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> vec1,
 		shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> vec2);
 	int GetCode(enum tokenType token);
-
+	string PrintID(int code);
 public:
 	LR1Parsing();
 	~LR1Parsing();
