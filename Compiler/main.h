@@ -104,12 +104,11 @@ struct terminal
 struct tokenRecord
 {
 	enum tokenType token;		//符号类型
-	shared_ptr<struct tokenRecord> next;	//指向下一个符号的指针
-	shared_ptr<struct nameItam> name_item;
+	shared_ptr<struct nameItem> name_item;
 	//这里以后还要添加一个指向符号表的指针
 	tokenRecord()
 	{
-		next = nullptr;
+		name_item = nullptr;
 	}
 };
 
@@ -117,32 +116,26 @@ struct nameItem
 {
 	string name;//每一个token的名字
 	enum tokenType token_type;//token的类型
-	enum tokenType type;//实际的类型
+	enum tokenType type;//实际的类型 只能是char int等基础类型
 	int* extendPtr;//扩展属性指针
+	int address;
+	//shared_ptr<struct nameItem> next;
+	size_t row_counter;//行计数器
+	size_t col_counter;//列计数器
 	
-	shared_ptr<struct nameItem> next;
-
-	union {
-		char ch;
-		int intrger;
-		double rear;
-		char* str;
-		int* address;//分配的内存地址
-	} value;
-	struct nameItem(){
-		name = nullptr;
-		extendPtr = nullptr;
-	}
+	char ch;
+	int intrger;
+	double rear;
+	char* str;
+	//分配的内存地址
 };
 
 struct nameTableHead
 {
-	stack<shared_ptr<struct nameTableHead>> otherNameTable;
-	shared_ptr<struct nameItem> name_item;
-
-	struct nameTableHead(){
-		name_item = nullptr;
-	}
+	map<string, shared_ptr<struct nameItem>> name_items;
+	vector<shared_ptr<struct nameTableHead>> childTable;
+	shared_ptr<struct nameTableHead> parentTable;
+	string funcName;
 };
 
 struct LR1ItemNode

@@ -4,7 +4,7 @@
 读入程序代码
 分析出Toke*/
 #include "NameTable.h"
-
+#include "main.h"
 
 class Scanner
 {
@@ -14,11 +14,14 @@ private:
 	ifstream ifs;	//源代码文件
 	ofstream ofs;	//token写出文件
 	string buffer;	//行缓冲区
-	shared_ptr<struct tokenRecord> head;	//token链表头指针
-	shared_ptr<struct tokenRecord> rear;	//token链表尾指针
-	NameTable nameTable;
-
+	
+	
+	//bool newProFlag;
+	//string nowFuncName;
 public:
+	NameTable nameTable;
+	vector<shared_ptr<struct tokenRecord>> tokenVector;
+
 	Scanner();
 	~Scanner();
 
@@ -30,7 +33,7 @@ public:
 	void Identify(char ch);	//标识符处理函数
 	void String(char ch);	//字符串处理函数
 	void Ch(char ch);		//字符处理函数
-	void newToken(enum tokenType token);
+	//void newToken(enum tokenType token);
 	void newToken(enum tokenType token, char ch);
 	void newToken(enum tokenType token, char* name);
 

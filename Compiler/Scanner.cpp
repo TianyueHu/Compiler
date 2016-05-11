@@ -7,9 +7,9 @@ Scanner::Scanner()
 {
 	row_counter = 0;
 	col_counter = 0;
-
-	head = make_shared<struct tokenRecord>();
-	rear = head;
+	//newProFlag = false;
+	//head = make_shared<struct tokenRecord>();
+	//rear = head;
 }
 
 
@@ -408,7 +408,7 @@ void Scanner::String(char ch)
 	}
 	else{
 		col_counter -= i;
-		newToken(DOUBLE_QUOTE);
+		newToken(DOUBLE_QUOTE, '\"');
 	}
 	
 	delete str;
@@ -424,32 +424,21 @@ void Scanner::Ch(char ch)
 		}
 		else{
 			col_counter -= 2;
-			newToken(Q_MARK);
+			newToken(Q_MARK, '\'');
 		}
 	}
 	else{
-		newToken(Q_MARK);
+		newToken(Q_MARK, '\'');
 		--col_counter;
 	}
-}
-
-void Scanner::newToken(enum tokenType token)
-{
-	shared_ptr<struct tokenRecord> recordPtr = make_shared<struct tokenRecord>();
-	recordPtr->token = token;
-	rear->next = recordPtr;
-	rear = rear->next;
-
-	recordPtr->name_item = nullptr;
-	ofs << token << " " << 0 << endl;
 }
 
 void Scanner::newToken(enum tokenType token, char ch)
 {
 	shared_ptr<struct tokenRecord> recordPtr = make_shared<struct tokenRecord>();
 	recordPtr->token = token;
-	rear->next = recordPtr;
-	rear = rear->next;
+	recordPtr->name_item = nullptr;
+	tokenVector.push_back(recordPtr);
 	ofs << token << " " << ch << endl;
 }
 
@@ -457,8 +446,30 @@ void Scanner::newToken(enum tokenType token, char* name)
 {
 	shared_ptr<struct tokenRecord> recordPtr = make_shared<struct tokenRecord>();
 	recordPtr->token = token;
-	rear->next = recordPtr;
-	rear = rear->next;
+	
+	if (token == FUNC){
+		nameTable.newProduce();
+		string nameStr(name);
+		nameTable.tablePtrStack.top()->funcName = nameStr;
+		recordPtr->name_item = nameTable.getItem(nameStr);
+		recordPtr->name_item->token_type = token;
+	}
+	if (token == ID || token == ARRAY){
+		string nameStr(name);
+		recordPtr->name_item = nameTable.getItem(nameStr);
+		recordPtr->name_item->token_type = token;
+	}
+	else if (token == STRING || token == INTEGER || token == REAL){
+		recordPtr->name_item = nameTable.getItem();
+		recordPtr->name_item->name = "";
+		recordPtr->name_item->token_type = token;
+		//recordPtr->name_item->value = 
+	}
+	else {
+		recordPtr->name_item = nullptr;
+	}
+	tokenVector.push_back(recordPtr);
+
 	ofs << token << " " << name << endl;
 
 }
