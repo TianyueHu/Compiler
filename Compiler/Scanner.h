@@ -20,7 +20,7 @@ private:
 	//string nowFuncName;
 public:
 	NameTable nameTable;
-	vector<shared_ptr<struct tokenRecord>> tokenVector;
+	queue<shared_ptr<struct tokenRecord>> tokenQueue;
 
 	Scanner();
 	~Scanner();

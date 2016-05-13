@@ -1,6 +1,6 @@
 #pragma once
 #include "ProductionSet.h"
-
+#include "Scanner.h"
 class LR1Parsing
 {
 private:
@@ -17,6 +17,16 @@ private:
 		shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> vec2);
 	int GetCode(enum tokenType token);
 	string PrintID(int code);
+	shared_ptr<struct variNode> genCode(int head, long long int production);
+
+
+	stack<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>> itemStack;
+	vector<shared_ptr<struct variNode>> variStack;
+	//stack<int> symbolStack;
+	vector<int> symbolStack;
+
+	Scanner *s;
+
 public:
 	LR1Parsing();
 	~LR1Parsing();
@@ -32,7 +42,6 @@ public:
 	void GetLR1ParsingTable();
 
 	void LR1();
-	
-	//计算闭包的函数
+	void genCode();
 };
 

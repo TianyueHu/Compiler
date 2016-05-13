@@ -4,7 +4,9 @@
 LR1Parsing::LR1Parsing()
 {
 	produceSet = new ProductionSet();
-
+	s = new Scanner();
+	s->OpenFile("e:\\test.txt");
+	s->scanner();
 }
 
 LR1Parsing::~LR1Parsing()
@@ -456,11 +458,13 @@ void LR1Parsing::LR1()
 
 	shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> item = itemSet.front();
 	int symbol = GetCode(GetNewToken());
-	stack<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>> itemStack;
-	//stack<int> symbolStack;
-	vector<int> symbolStack;
+	
 	itemStack.push(item);
 	symbolStack.push_back(0);
+	shared_ptr<struct variNode> head = make_shared<struct variNode>();
+	head->offset = 0;
+	//variStack.push_back(head);
+
 	while (true)
 	{
 		struct itemSetNode itemNode = itemTable[itemStack.top()][symbol];
@@ -472,7 +476,7 @@ void LR1Parsing::LR1()
 			for (size_t i = 0; i < itemStack.size(); ++i){
 				ofs << symbolStack[i] << " ";
 			}
-			cout << endl;
+			ofs << endl;
 			symbol = GetCode(GetNewToken());
 		}
 		else if (itemNode.flag == 2){//规约
@@ -769,4 +773,85 @@ string LR1Parsing::PrintID(int token)
 	if (token == 89)
 		return "项1";
 	return "empty";
+}
+
+shared_ptr<struct variNode> LR1Parsing::genCode(int head, long long int production)
+{
+	shared_ptr<struct variNode> newNode = make_shared<struct variNode>();
+
+	switch (head){
+	case 50:
+		break;
+	case 51:
+		break;
+	case 52:
+		break;
+	case 53:
+		switch (production){
+		case 12:
+			//char
+			newNode->type = CHAR;
+			newNode->width = 1;
+			break;
+		case 13:
+			//int
+			newNode->type = INT;
+			newNode->width = 1;
+			break;
+		case 14:
+			//float
+			newNode->type = FLOAT;
+			newNode->width = 1;
+			break;
+		case 15:
+			//double
+			newNode->type = DOUBLE;
+			newNode->width = 1;
+			break;
+		default:
+			break;
+		}
+		break;
+	case 58:
+		switch (production){
+		case 4:
+			newNode->name = (*variStack.end())->name;
+			newNode->token_type = ID;
+			newNode->offset = 0;
+			break;
+		case 5178318:
+			newNode->name = (*variStack.end())->name;
+			newNode->token_type = ARRAY;
+			//这里也有可能是value
+			newNode->offset = (*(variStack.end()-2))->offset;
+			break;
+		}
+		break;
+	case 83:
+		switch (production){
+		case 4:
+			//标识符
+			genCode();
+		case 8:
+			//整数常量
+		case 9:
+			//小数常量
+		case 7:
+			//字符串常量
+		case 43:
+			//字符
+
+		default:
+			break;
+		}
+	default:
+		;
+	}
+
+	return newNode;
+}
+
+void LR1Parsing::genCode()
+{
+	//输出一句中间代码什么也不做
 }

@@ -119,14 +119,17 @@ struct nameItem
 	enum tokenType type;//实际的类型 只能是char int等基础类型
 	int* extendPtr;//扩展属性指针
 	int address;
+	int offset;
 	//shared_ptr<struct nameItem> next;
 	size_t row_counter;//行计数器
 	size_t col_counter;//列计数器
+	union{
+		char ch;
+		int integer;
+		double rear;
+		char* str;
+	} value;
 	
-	char ch;
-	int intrger;
-	double rear;
-	char* str;
 	//分配的内存地址
 };
 
@@ -173,4 +176,14 @@ struct itemSetNode
 		head = 0;
 		code = 0;
 	}
+};
+
+struct variNode
+{
+	string name;
+	int address;
+	int offset;
+	enum tokenType token_type;
+	enum tokenType type;
+	int width;
 };

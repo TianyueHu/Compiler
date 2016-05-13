@@ -438,7 +438,7 @@ void Scanner::newToken(enum tokenType token, char ch)
 	shared_ptr<struct tokenRecord> recordPtr = make_shared<struct tokenRecord>();
 	recordPtr->token = token;
 	recordPtr->name_item = nullptr;
-	tokenVector.push_back(recordPtr);
+	tokenQueue.push(recordPtr);
 	ofs << token << " " << ch << endl;
 }
 
@@ -468,7 +468,7 @@ void Scanner::newToken(enum tokenType token, char* name)
 	else {
 		recordPtr->name_item = nullptr;
 	}
-	tokenVector.push_back(recordPtr);
+	tokenQueue.push(recordPtr);
 
 	ofs << token << " " << name << endl;
 
