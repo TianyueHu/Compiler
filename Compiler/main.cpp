@@ -4,9 +4,10 @@
 #include "LR1Parsing.h"
 int main()
 {
-	Scanner *s = new Scanner();
+	/*Scanner *s = new Scanner();
 	s->OpenFile("e:\\test.txt");
 	s->scanner();
+	s->tokenQueue;*/
 
 	/*
 	LL1Parsing ll1;

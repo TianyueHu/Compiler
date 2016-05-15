@@ -105,10 +105,13 @@ struct tokenRecord
 {
 	enum tokenType token;		//符号类型
 	shared_ptr<struct nameItem> name_item;
-	//这里以后还要添加一个指向符号表的指针
+	//常数值就记录在下面这些地方,方便输出中间代码
+	string value;
 	tokenRecord()
 	{
 		name_item = nullptr;
+		token = EMPTY;
+		
 	}
 };
 
@@ -186,4 +189,12 @@ struct variNode
 	enum tokenType token_type;
 	enum tokenType type;
 	int width;
+	variNode()
+	{
+		name = "";
+		address = 0;
+		offset = 0;
+		token_type = EMPTY;
+		type = EMPTY;
+	}
 };

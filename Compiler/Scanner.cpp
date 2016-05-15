@@ -420,7 +420,10 @@ void Scanner::Ch(char ch)
 	if (++col_counter < buffer.size() && isalpha(c = buffer[col_counter])){
 		//对c做一个处理
 		if (++col_counter < buffer.size() && buffer[col_counter] == '\''){
-			newToken(CH, c);
+			char a[2];
+			a[0] = c;
+			a[1] = '\0';
+			newToken(CH, a);
 		}
 		else{
 			col_counter -= 2;
@@ -445,25 +448,27 @@ void Scanner::newToken(enum tokenType token, char ch)
 void Scanner::newToken(enum tokenType token, char* name)
 {
 	shared_ptr<struct tokenRecord> recordPtr = make_shared<struct tokenRecord>();
+	string nameStr(name);
 	recordPtr->token = token;
 	
 	if (token == FUNC){
 		nameTable.newProduce();
-		string nameStr(name);
 		nameTable.tablePtrStack.top()->funcName = nameStr;
 		recordPtr->name_item = nameTable.getItem(nameStr);
 		recordPtr->name_item->token_type = token;
+		recordPtr->name_item->name = nameStr;
 	}
 	if (token == ID || token == ARRAY){
-		string nameStr(name);
+		
 		recordPtr->name_item = nameTable.getItem(nameStr);
 		recordPtr->name_item->token_type = token;
+		recordPtr->name_item->name = nameStr;
 	}
-	else if (token == STRING || token == INTEGER || token == REAL){
-		recordPtr->name_item = nameTable.getItem();
-		recordPtr->name_item->name = "";
+	else if (token == STRING || token == INTEGER || token == REAL || token == CH){
+		recordPtr->name_item = nameTable.getItem(nameStr);
 		recordPtr->name_item->token_type = token;
-		//recordPtr->name_item->value = 
+		recordPtr->name_item->name = "";
+		recordPtr->value = nameStr;
 	}
 	else {
 		recordPtr->name_item = nullptr;
