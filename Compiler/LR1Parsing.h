@@ -20,12 +20,14 @@ private:
 	int GetCode(enum tokenType token);
 	string PrintID(int code);
 	shared_ptr<struct tokenRecord> GetNextTokenRecord();
-
+	void gencode(int nextCode, string op, string dest, string source1, string source2);
+	int LR1Parsing::getNextCode();
 	stack<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>> itemStack;
-	
+	vector<shared_ptr<struct variNode>> variStack;
 	vector<int> symbolStack;
 	vector<shared_ptr<struct tokenRecord>> tokenRecordStack;
-
+	int nextCode;
+	char ram[1024];
 	Scanner *s;
 
 public:

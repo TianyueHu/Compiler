@@ -8,6 +8,7 @@ LR1Parsing::LR1Parsing()
 	s->OpenFile("e:\\test.txt");
 	s->scanner();
 	main_offset = 0;
+	nextCode = 0;
 }
 
 LR1Parsing::~LR1Parsing()
@@ -262,7 +263,6 @@ void LR1Parsing::GetClosureSet()
 
 void LR1Parsing::GetClosure(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> item)
 {
-	//展示不考虑重复的问题
 	vector<shared_ptr<struct LR1ItemNode>> tempSet;
 	bool flag = true;
 
@@ -468,7 +468,7 @@ void LR1Parsing::LR1()
 	itemStack.push(item);
 	symbolStack.push_back(0);
 	tokenRecordStack.push_back(headToken);
-
+	variStack.push_back(head);
 	while (true)
 	{
 		struct itemSetNode itemNode = itemTable[itemStack.top()][symbol];
@@ -476,6 +476,19 @@ void LR1Parsing::LR1()
 			itemStack.push(itemNode.gotoPtr);
 			symbolStack.push_back(symbol);
 			tokenRecordStack.push_back(token_record);
+			shared_ptr<struct variNode> newNode = make_shared<struct variNode>();
+			
+			//token_record 一个终结符
+			newNode->token_type = token_record->token;
+			if (token_record->name_item){
+				newNode->name = token_record->name_item->name;
+				newNode->offset = token_record->name_item->offset;
+				newNode->width = token_record->name_item->width;
+				newNode->addr = token_record->name_item->address;
+				newNode->token_type = token_record->name_item->token_type;
+				newNode->nameItemPtr = token_record->name_item;
+			}
+			variStack.push_back(newNode);
 			ofs << "push:" << symbol << " " << PrintID(symbol) << endl;
 			ofs << "Stack:";
 			for (size_t i = 0; i < itemStack.size(); ++i){
@@ -489,13 +502,140 @@ void LR1Parsing::LR1()
 
 			ofs << "规约:" << PrintID(itemNode.head)<< itemNode.head << "-->" << itemNode.code << endl;
 			int length = (GetLength(itemNode.code) + 1) / 2;
+			vector<shared_ptr<struct variNode>> tempRight;
 			while (length > 0){
 
 				itemStack.pop();
 				symbolStack.pop_back();
 				tokenRecordStack.pop_back();
+				tempRight.push_back(variStack[variStack.size() - 1]);
+				variStack.pop_back();
 				--length;
 			}
+			shared_ptr<struct variNode> newNode = make_shared<struct variNode>();
+			long long int code = itemNode.code;
+			//**************************************************************************************
+			switch (itemNode.head)
+			{
+			case 53:
+				switch (code){
+				case 12:
+					//char
+					newNode->type = CHAR;
+					newNode->width = 1;
+					break;
+				case 13:
+					//int
+					newNode->type = INT;
+					newNode->width = 4;
+					break;
+				case 14:
+					//float
+					newNode->type = FLOAT;
+					newNode->width = 4;
+					break;
+				case 15:
+					//double
+					newNode->type = DOUBLE;
+					newNode->width = 8;
+					break;
+				}
+				break;
+			case 57:
+				newNode->nameItemPtr = tempRight[1]->nameItemPtr;
+				if (tempRight[1]->type == ID){
+					if (newNode->nameItemPtr){
+						newNode->nameItemPtr->address = main_offset;
+						
+						main_offset += newNode->width;
+					}
+				}
+				else if (tempRight[1]->type == ARRAY){
+					if (newNode->nameItemPtr){
+						newNode->nameItemPtr->address = main_offset;
+						
+					}
+				}
+				break;
+			case 58:
+				newNode->name = tempRight[0]->name;
+				newNode->nameItemPtr = tempRight[0]->nameItemPtr;
+				switch (code){
+				case 4:
+					newNode->token_type = ID;
+					newNode->offset = 0;
+					
+					break;
+				case 5178318:
+					newNode->token_type = ARRAY;
+					newNode->offset = atoi((tempRight[1]->name).c_str());
+					break;
+				}
+				break;
+			case 59:
+				if (tempRight.size() > 1){
+					for (int k = 0; k < tempRight.size() - 2; ++k){
+						newNode->s.push(tempRight[k]->name);
+					}
+				}
+			case 70:
+				switch (code){
+				case 42071:
+					tempRight[2]->name = tempRight[0]->name;
+					tempRight[2]->addr = tempRight[0]->addr;
+					gencode(0, "=", tempRight[2]->name, tempRight[0]->name, "-");
+					
+					break;
+				case 51783182071:
+					gencode(0, "*", "t1", tempRight[3]->name, tempRight[5]->width + "");
+					break;
+				case 6108411:
+					break;
+				}
+				
+				break;
+			case 82:
+				newNode->name = tempRight[0]->name;
+				switch (code){
+				case 83:
+					newNode->addr = tempRight[0]->addr;
+					
+					break;
+				case 5178318:
+					newNode->addr = tempRight[0]->addr + tempRight[0]->width*tempRight[0]->offset;
+
+					break;
+				case 6108411:
+					break;
+				}
+				break;
+
+			case 83:
+				newNode->name = tempRight[0]->name;
+				newNode->addr = tempRight[0]->addr;
+				newNode->offset = tempRight[0]->offset;
+				break;
+			case 85:
+				newNode->name = tempRight[0]->name;
+				newNode->op = tempRight[0]->name;
+				break;
+			case 86:
+				newNode->name = tempRight[0]->name;
+				newNode->op = tempRight[0]->name;
+				break;
+			case 89:
+				switch (code){
+				case :
+					break;
+				case :
+					break;
+				}
+			default:
+				break;
+			}
+			//**************************************************************************************
+
+			variStack.push_back(newNode);
 			symbolStack.push_back(itemNode.head);
 			tokenRecordStack.push_back(make_shared<struct tokenRecord>());
 			//cout << "push:" << itemNode.head << endl;
@@ -792,3 +932,21 @@ string LR1Parsing::PrintID(int token)
 	return "empty";
 }
 
+void LR1Parsing::gencode(int nextCode, string op, string dest, string source1, string source2)
+{
+	if (nextCode){
+		cout << getNextCode() << " : jmp ";
+		cout << nextCode;
+		cout << " " + op + " " + dest + " "
+			+ source1 + " " + source2 << endl;
+	}
+	else{
+		cout << getNextCode() << " : " + op + " " + dest + " " + source1 + " " + source2 << endl;;
+	}
+	
+}
+
+int LR1Parsing::getNextCode()
+{
+	return nextCode++;
+}

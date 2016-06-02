@@ -123,6 +123,7 @@ struct nameItem
 	int* extendPtr;//扩展属性指针
 	int address;
 	int offset;
+	int width;
 	//shared_ptr<struct nameItem> next;
 	size_t row_counter;//行计数器
 	size_t col_counter;//列计数器
@@ -189,16 +190,16 @@ struct variNode
 	enum tokenType token_type;
 	enum tokenType type;
 	int width;//类型的宽度
-	queue<string> que;//方便初始化
+	stack<string> s;//方便初始化
 	double syn;// 综合属性，方便计算
 	double inh;// 继承属性，单纯用来计算，最好是double型
 
 	string op;					//操作符
 	int instr;					//当前指令地址
-	vector<int> truelist;	//布尔表达式真出口
-	vector<int> falselist;	//布尔表达式假出口
-	vector<int> nextlist;	//跳转指令出口
-
+	int truelist;	//布尔表达式真出口
+	int falselist;	//布尔表达式假出口
+	int nextlist;	//跳转指令出口
+	shared_ptr<struct nameItem> nameItemPtr;//方便修改符号表里面的内容
 	variNode()
 	{
 		name = "";

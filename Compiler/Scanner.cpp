@@ -459,15 +459,14 @@ void Scanner::newToken(enum tokenType token, char* name)
 		recordPtr->name_item->name = nameStr;
 	}
 	if (token == ID || token == ARRAY){
-		
 		recordPtr->name_item = nameTable.getItem(nameStr);
 		recordPtr->name_item->token_type = token;
 		recordPtr->name_item->name = nameStr;
 	}
-	else if (token == STRING || token == INTEGER || token == REAL || token == CH){
+	else if (token == STRING || token == CH || token == INTEGER || token == REAL){
 		recordPtr->name_item = nameTable.getItem(nameStr);
 		recordPtr->name_item->token_type = token;
-		recordPtr->name_item->name = "";
+		recordPtr->name_item->name = nameStr;
 		recordPtr->value = nameStr;
 	}
 	else {
