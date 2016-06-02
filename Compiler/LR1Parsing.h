@@ -9,7 +9,7 @@ private:
 	vector<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>> itemSet;
 	ProductionSet* produceSet;
 	map<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>, struct itemSetNode*> itemTable;
-
+	int main_offset; //×Ü³ÌÐòµÄoffset
 	int GetLength(long long int code);
 	int Get2Code(long long int code, int n);
 	void GetClosure(shared_ptr<vector<shared_ptr<struct LR1ItemNode>>> item);
@@ -21,9 +21,8 @@ private:
 	string PrintID(int code);
 	shared_ptr<struct tokenRecord> GetNextTokenRecord();
 
-	shared_ptr<struct variNode> genCode(int head, long long int production);
 	stack<shared_ptr<vector<shared_ptr<struct LR1ItemNode>>>> itemStack;
-	vector<shared_ptr<struct variNode>> variStack;
+	
 	vector<int> symbolStack;
 	vector<shared_ptr<struct tokenRecord>> tokenRecordStack;
 
@@ -44,6 +43,5 @@ public:
 	void GetLR1ParsingTable();
 
 	void LR1();
-	void genCode();
 };
 

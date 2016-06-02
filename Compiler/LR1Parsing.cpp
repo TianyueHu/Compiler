@@ -7,6 +7,7 @@ LR1Parsing::LR1Parsing()
 	s = new Scanner();
 	s->OpenFile("e:\\test.txt");
 	s->scanner();
+	main_offset = 0;
 }
 
 LR1Parsing::~LR1Parsing()
@@ -467,7 +468,6 @@ void LR1Parsing::LR1()
 	itemStack.push(item);
 	symbolStack.push_back(0);
 	tokenRecordStack.push_back(headToken);
-	variStack.push_back(head);
 
 	while (true)
 	{
@@ -484,22 +484,18 @@ void LR1Parsing::LR1()
 			ofs << endl;
 			symbol = GetCode(GetNewToken());
 			token_record = GetNextTokenRecord();
-			variStack.push_back(make_shared<struct variNode>());
 		}
 		else if (itemNode.flag == 2){//规约
 
 			ofs << "规约:" << PrintID(itemNode.head)<< itemNode.head << "-->" << itemNode.code << endl;
 			int length = (GetLength(itemNode.code) + 1) / 2;
-			shared_ptr<struct variNode> push = genCode(itemNode.head, itemNode.code);
 			while (length > 0){
 
 				itemStack.pop();
 				symbolStack.pop_back();
 				tokenRecordStack.pop_back();
-				variStack.pop_back();
 				--length;
 			}
-			variStack.push_back(push);
 			symbolStack.push_back(itemNode.head);
 			tokenRecordStack.push_back(make_shared<struct tokenRecord>());
 			//cout << "push:" << itemNode.head << endl;
@@ -796,142 +792,3 @@ string LR1Parsing::PrintID(int token)
 	return "empty";
 }
 
-shared_ptr<struct variNode> LR1Parsing::genCode(int head, long long int production)
-{
-	shared_ptr<struct variNode> newNode = make_shared<struct variNode>();
-	switch (head){
-	case 50:
-		break;
-	case 51:
-		break;
-	case 52:
-		break;
-	case 53:
-		switch (production){
-		case 12:
-			//char
-			newNode->type = CHAR;
-			newNode->width = 1;
-			break;
-		case 13:
-			//int
-			newNode->type = INT;
-			newNode->width = 1;
-			break;
-		case 14:
-			//float
-			newNode->type = FLOAT;
-			newNode->width = 1;
-			break;
-		case 15:
-			//double
-			newNode->type = DOUBLE;
-			newNode->width = 1;
-			break;
-		default:
-			break;
-		}
-		break;
-	case 58:
-		switch (production){
-		case 4:
-			//标识符
-			newNode->name = (tokenRecordStack.back())->name_item->name;
-			newNode->token_type = ID;
-			newNode->offset = 0;
-			break;
-		case 5178318:
-			//数组名[基本表达式]
-			newNode->name = (*(tokenRecordStack.end() - 4))->name_item->name;
-			newNode->token_type = ARRAY;
-			//这里也有可能是value
-			newNode->offset = (*(variStack.end()-2))->address;
-			break;
-		}
-		break;
-	case 70:
-		switch (production){
-		case 42071:
-			//标识符=条件表达式
-			cout << (*(tokenRecordStack.end() - 3))->name_item->name << "=t8" << endl;
-			(*(variStack.end() - 3))->address = variStack.back()->address;
-			break;
-		case 51783182071:
-			//数组名[基本表达式]=条件表达式
-			break;
-		case 6108411:
-			//函数名(实参列表)
-			break;
-		}
-		break;
-	case 82:
-		switch (production){
-		case 83:
-			//基本表达式
-			//gencode(基本表达式.addr=addr)
-			cout << "t2=t1" << endl;
-			newNode->address = variStack.back()->address;
-			break;
-		case 5178318:{
-			//数组名[基本表达式]
-			//gencode(后缀表达式.addr = 数组.offset + 基本表达式.addr*类型.width)
-				
-				
-				int i = 1;
-				switch ((*(variStack.end() - 4))->token_type){
-				case CHAR:
-					cout << "t2=t1*1" << endl;
-					cout << "t2=" + (*(tokenRecordStack.end() - 4))->name_item->name + ".addr" + "t2" << endl;
-					i = 1;
-					break;
-				case INT:
-					cout << "t2=t1*4" << endl;
-					cout << "t2=" + (*(variStack.end() - 4))->name + ".addr" + "t2" << endl;
-					i = 4;
-					break;
-				case FLOAT:
-					cout << "t2=t1*4" << endl;
-					cout << "t2=" + (*(variStack.end() - 4))->name + ".addr" + "t2" << endl;
-					i = 4;
-					break;
-				case DOUBLE:
-					cout << "t2=t1*8" << endl;
-					cout << "t2=" + (*(variStack.end() - 4))->name + ".addr" + "t2" << endl;
-					i = 8;
-					break;
-			}
-			newNode->address = (*(variStack.end() - 4))->offset + (*(variStack.end() - 4))->address * i;
-			break; 
-		}
-		case 6108411:
-			// 函数名(实参列表)
-			;
-		}
-		break;
-	case 83:
-		switch (production){
-		case 4:
-			//标识符
-			//gencode(基本表达式.addr=addr)
-			cout << "t1=" + tokenRecordStack.back()->name_item->name << endl;
-			newNode->address = variStack.back()->address;
-			break;
-		default:
-			//常量
-			//gencode(基本表达式.addr=addr)
-			cout << "t1=" + tokenRecordStack.back()->value << endl;
-			newNode->address = variStack.back()->address;
-			break;
-		}
-		break;
-	default:
-		;
-	}
-
-	return newNode;
-}
-
-void LR1Parsing::genCode()
-{
-	//输出一句中间代码什么也不做
-}

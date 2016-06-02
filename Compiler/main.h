@@ -184,15 +184,25 @@ struct itemSetNode
 struct variNode
 {
 	string name;
-	int address;
-	int offset;
+	int addr;//程序的offset
+	int offset;//自己的一个属性，主要用于数组元素
 	enum tokenType token_type;
 	enum tokenType type;
-	int width;
+	int width;//类型的宽度
+	queue<string> que;//方便初始化
+	double syn;// 综合属性，方便计算
+	double inh;// 继承属性，单纯用来计算，最好是double型
+
+	string op;					//操作符
+	int instr;					//当前指令地址
+	vector<int> truelist;	//布尔表达式真出口
+	vector<int> falselist;	//布尔表达式假出口
+	vector<int> nextlist;	//跳转指令出口
+
 	variNode()
 	{
 		name = "";
-		address = 0;
+		addr = 0;
 		offset = 0;
 		token_type = EMPTY;
 		type = EMPTY;

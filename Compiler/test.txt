@@ -1,0 +1,40 @@
+int main(int p int q)
+{
+ int a = {5};
+ int a1;
+
+ double b = {7.56e-3};
+ float c[5] = {0 0 0 0 0};
+ char d = {'a'};
+ 
+ int a2;
+ int a3;
+
+ a1 = a+b;
+ a2 = a+a1/b-5*a;
+ aa(b,a1,);
+ if (a1>0)
+    {a1 = a2+1; 
+     a2 = c[2]+1;
+    }
+ else
+    {a2=a1-3;}
+ while(a2>10) 
+    {a2 = a2+1;
+     a2 = c[2]+1;}
+ return 0;
+}
+int aa(int p int q)
+{
+ int a = {5};
+ int a1;
+
+ a1 = a+b;
+ a2 = a+a1/b-5*a;
+
+ for(a=0;a<100;a=a+1){
+ a2 = a+a1/b-5*a;
+}
+ return 0;
+}
+
